@@ -69,6 +69,22 @@ Expected output:
 Status: operational
 ```
 
+Display basic system information:
+
+```bash
+infra-toolkit system-info
+```
+
+Example output:
+
+System Information
+------------------
+Operating system: Linux
+Python version: 3.14.4
+Architecture: x86_64
+
+Note: The output reflects the environment where the command is executed, so values may differ across operating systems and machines.
+
 Display available commands:
 
 ```bash

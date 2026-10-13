@@ -26,3 +26,20 @@ def test_help_command_exits_successfully(
         assert exc.code == 0
     else:
         raise AssertionError("Help should exit successfully")
+
+
+def test_system_info_command_prints_system_details(
+    monkeypatch,
+    capsys,
+) -> None:
+    monkeypatch.setattr("sys.argv", ["infra-toolkit", "system-info"])
+
+    exit_code = main()
+    captured = capsys.readouterr()
+
+    assert exit_code == 0
+    assert "System Information" in captured.out
+    assert "Operating system:" in captured.out
+    assert "Python version:" in captured.out
+    assert "Architecture:" in captured.out
+    assert captured.err == ""
