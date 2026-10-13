@@ -39,9 +39,19 @@ A Python-based toolkit for infrastructure operations, built as part of my hands-
 - [x] All six automated tests passing.
 - [x] GitHub Actions pipeline passing.
 
+**Milestone 4 — Resource usage monitoring** (implemented; local checks passing)
+
+- [x] Resource usage module implemented using `psutil`.
+- [x] CPU, memory, and disk usage percentages reported.
+- [x] `resource-usage` subcommand integrated into the `infra-toolkit` CLI.
+- [x] Automated tests added for resource metrics and CLI output.
+- [x] Resource collection tests use mocked metrics for deterministic results.
+- [x] Ruff linting and formatting checks passing.
+- [x] All nine automated tests passing locally.
+
 ## Development
 
-The project uses Python 3.14+, pytest, and Ruff. A local virtual environment is stored in `.venv/` and excluded from version control through `.gitignore`.
+The project uses Python 3.14+, `psutil` for resource monitoring, pytest for automated testing, and Ruff for linting and formatting. A local virtual environment is stored in `.venv/` and excluded from version control through `.gitignore`.
 
 Clone the repository using SSH or HTTPS:
 
@@ -96,6 +106,24 @@ Architecture: x86_64
 ```
 
 *Note: The output reflects the environment where the command is executed, so values may differ across operating systems and machines.*
+
+Display current CPU, memory, and disk usage:
+
+```bash
+infra-toolkit resource-usage
+```
+
+Example output:
+
+```text
+Resource Usage
+--------------
+CPU usage: 0.7%
+Memory usage: 7.0%
+Disk usage: 0.4%
+```
+
+*Note: These percentages are illustrative. Actual values depend on current system activity and the filesystem containing the current working directory.*
 
 
 Display available commands:

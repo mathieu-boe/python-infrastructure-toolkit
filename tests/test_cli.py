@@ -43,3 +43,25 @@ def test_system_info_command_prints_system_details(
     assert "Python version:" in captured.out
     assert "Architecture:" in captured.out
     assert captured.err == ""
+
+
+def test_resource_usage_command_prints_metrics(
+    monkeypatch,
+    capsys,
+) -> None:
+    monkeypatch.setattr("sys.argv", ["infra-toolkit", "resource-usage"])
+    monkeypatch.setattr(
+        "infra_toolkit.cli.get_resource_usage",
+        lambda: {
+            "cpu_percent": 25.0,
+            "memory_percent": 60.0,
+            "disk_percent": 75.0,
+        },
+    )
+
+    exit_code = main()
+    captured = capsys.readouterr()
+
+    assert exit_code == 0
+    assert captured.out == ("Resource Usage\n--------------\nCPU usage: 25.0%\nMemory usage: 60.0%\nDisk usage: 75.0%\n")
+    assert captured.err == ""
