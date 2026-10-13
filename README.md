@@ -60,7 +60,7 @@ A Python-based toolkit for infrastructure operations, built as part of my hands-
 - [x] Automated tests added for threshold evaluation and CLI warning behaviour.
 - [x] Ruff linting and formatting checks passing.
 - [x] All 15 automated tests passing locally.
-- [ ] GitHub Actions pipeline passing.
+- [x] GitHub Actions pipeline passing.
 
 ## Development
 
