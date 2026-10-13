@@ -27,13 +27,14 @@ The project uses Python and pytest. A local virtual environment is stored in `.v
 venv/
 in .gitgnore.
 
-To run the tests from the repository root:
+To install the project in editable mode and run the tests from the repository root:
 
 ```bash
-PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_health.py -v
+python -m pip install -e ".[dev]"
+python -m pytest tests/test_health.py -v
 ```
 
-Note: We don't have a pyproject.toml yet, run tests with PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_health.py -v to ensure Python can locate the infra_toolkit package.
+Note: ~~We don't have a pyproject.toml yet, run tests with PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_health.py -v to ensure Python can locate the infra_toolkit package.~~
 
 
 ## Security and cost
