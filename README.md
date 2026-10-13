@@ -36,7 +36,7 @@ A Python-based toolkit for infrastructure operations, built as part of my hands-
 - [x] `system-info` subcommand integrated into the `infra-toolkit` CLI.
 - [x] Automated tests added for system information and CLI output.
 - [x] Ruff linting and formatting checks passing.
-- [x] All six automated tests passing.
+- [x] All 6 automated tests passing.
 - [x] GitHub Actions pipeline passing.
 
 **Milestone 4 — Resource usage monitoring** (implemented; local checks passing)
@@ -47,7 +47,20 @@ A Python-based toolkit for infrastructure operations, built as part of my hands-
 - [x] Automated tests added for resource metrics and CLI output.
 - [x] Resource collection tests use mocked metrics for deterministic results.
 - [x] Ruff linting and formatting checks passing.
-- [x] All nine automated tests passing locally.
+- [x] All 9 automated tests passing locally.
+
+**Milestone 5 — Threshold-based resource monitoring** (implemented; local checks passing)
+
+- [x] Reusable threshold evaluation function implemented in `thresholds.py`.
+- [x] Default resource usage threshold set to 85%.
+- [x] CPU, memory, and disk usage checked against the threshold.
+- [x] Terminal warning displayed when one or more resources exceed the threshold.
+- [x] Names of resources exceeding the threshold displayed in the warning.
+- [x] Invalid threshold values rejected by the threshold evaluation function.
+- [x] Automated tests added for threshold evaluation and CLI warning behaviour.
+- [x] Ruff linting and formatting checks passing.
+- [x] All 15 automated tests passing locally.
+- [ ] GitHub Actions pipeline passing.
 
 ## Development
 
@@ -125,6 +138,23 @@ Disk usage: 0.4%
 
 *Note: These percentages are illustrative. Actual values depend on current system activity and the filesystem containing the current working directory.*
 
+When CPU, memory, or disk usage exceeds the default threshold of 85%, the CLI displays a warning identifying the affected resources.
+
+Example warning output:
+
+```text
+Resource Usage
+--------------
+CPU usage: 92.0%
+Memory usage: 60.0%
+Disk usage: 88.0%
+
+WARNING: Resource usage threshold exceeded (85%).
+- CPU
+- Disk
+```
+
+If no resource exceeds the threshold, the CLI reports that all resource usage is within thresholds. The threshold is currently fixed at 85% in the CLI; configurable command-line thresholds are not implemented yet.
 
 Display available commands:
 
