@@ -29,6 +29,16 @@ A Python-based toolkit for infrastructure operations, built as part of my hands-
 - [x] All local quality checks passing.
 - [x] GitHub Actions pipeline passing.
 
+**Milestone 3 — System information command** (completed)
+
+- [x] System information module implemented using Python's `platform` standard library.
+- [x] Operating system, Python version, and machine architecture reported.
+- [x] `system-info` subcommand integrated into the `infra-toolkit` CLI.
+- [x] Automated tests added for system information and CLI output.
+- [x] Ruff linting and formatting checks passing.
+- [x] All six automated tests passing.
+- [x] GitHub Actions pipeline passing.
+
 ## Development
 
 The project uses Python 3.14+, pytest, and Ruff. A local virtual environment is stored in `.venv/` and excluded from version control through `.gitignore`.
@@ -77,13 +87,16 @@ infra-toolkit system-info
 
 Example output:
 
+```text
 System Information
 ------------------
 Operating system: Linux
 Python version: 3.14.4
 Architecture: x86_64
+```
 
-Note: The output reflects the environment where the command is executed, so values may differ across operating systems and machines.
+*Note: The output reflects the environment where the command is executed, so values may differ across operating systems and machines.*
+
 
 Display available commands:
 
