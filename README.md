@@ -11,34 +11,80 @@ A Python-based toolkit for infrastructure operations, built as part of my hands-
 
 ## Current status
 
-**Milestone 1 — Initial project setup**
+**Milestone 1 — Initial project setup** (completed)
 
 - [x] Python virtual environment created.
 - [x] Initial package structure established.
 - [x] First automated test passing.
-- [ ] Configure pyproject.toml.
-- [ ] CI pipeline configured.
-- [ ] First infrastructure utility implemented.
+- [x] `pyproject.toml` configured with project metadata and development dependencies.
+- [x] CI pipeline configured with GitHub Actions.
+
+**Milestone 2 — Initial CLI implementation** (completed)
+
+- [x] Command-line interface implemented using Python's `argparse`.
+- [x] Health command implemented.
+- [x] Console command `infra-toolkit` configured.
+- [x] Automated tests added for CLI behaviour and health checks.
+- [x] Ruff linting and formatting checks configured.
+- [x] All local quality checks passing.
+- [x] GitHub Actions pipeline passing.
 
 ## Development
 
-The project uses Python and pytest. A local virtual environment is stored in `.venv/` and excluded from version control through
-.venv/
-venv/
-in .gitgnore.
+The project uses Python 3.14+, pytest, and Ruff. A local virtual environment is stored in `.venv/` and excluded from version control through `.gitignore`.
 
-To install the project in editable mode and run the tests from the repository root:
+Clone the repository using SSH or HTTPS:
+
+```bash
+# SSH (requires an SSH key configured with GitHub)
+git clone git@github.com:mathieu-boe/python-infrastructure-toolkit.git
+
+# Alternatively, you can use HTTPS
+git clone https://github.com/mathieu-boe/python-infrastructure-toolkit.git
+```
+
+Enter the project directory and create a virtual environment:
+
+```bash
+cd python-infrastructure-toolkit
+python3 -m venv .venv
+source .venv/bin/activate
+```
+
+Install the project in editable mode with its development dependencies:
 
 ```bash
 python -m pip install -e ".[dev]"
-python -m pytest tests/test_health.py -v
 ```
 
-Note: ~~We don't have a pyproject.toml yet, run tests with PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_health.py -v to ensure Python can locate the infra_toolkit package.~~
+Run the health check:
 
+```bash
+infra-toolkit health
+```
+
+Expected output:
+
+```text
+Status: operational
+```
+
+Display available commands:
+
+```bash
+infra-toolkit --help
+```
+
+Run the quality checks and automated tests from the repository root:
+
+```bash
+python -m ruff check .
+python -m ruff format --check .
+python -m pytest -v
+```
 
 ## Security and cost
 
-The initial development environment runs locally and does not require AWS resources/cloud expenditure.
+The current development environment runs locally and does not require AWS resources/cloud expenditure.
 
 No credentials, secrets, or generated virtual-environment files are to be committed.
