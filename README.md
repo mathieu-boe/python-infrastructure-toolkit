@@ -193,7 +193,13 @@ Invalid values are rejected with a command-line error rather than a Python trace
 
 ```bash
 infra-toolkit resource-usage --threshold 101
+usage: infra-toolkit resource-usage [-h] [--threshold THRESHOLD]
+infra-toolkit resource-usage: error: argument --threshold: Threshold must be between 0 and 100.
+```
+```bash
 infra-toolkit resource-usage --threshold abc
+usage: infra-toolkit resource-usage [-h] [--threshold THRESHOLD]
+infra-toolkit resource-usage: error: argument --threshold: Threshold must be a number between 0 and 100.
 ```
 
 Display the available resource monitoring options:
