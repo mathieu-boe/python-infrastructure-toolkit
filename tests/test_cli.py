@@ -1,3 +1,5 @@
+import pytest
+
 from infra_toolkit.cli import main
 
 
@@ -75,7 +77,10 @@ def test_resource_usage_command_prints_metrics(
     assert captured.err == ""
 
 
-def test_resource_usage_command_warns_when_threshold_exceeded(monkeypatch, capsys) -> None:
+def test_resource_usage_command_warns_when_threshold_exceeded(
+    monkeypatch,
+    capsys,
+) -> None:
     monkeypatch.setattr("sys.argv", ["infra-toolkit", "resource-usage"])
     monkeypatch.setattr(
         "infra_toolkit.cli.get_resource_usage",
@@ -97,3 +102,60 @@ def test_resource_usage_command_warns_when_threshold_exceeded(monkeypatch, capsy
     assert "- Disk" in captured.out
     assert "- Memory" not in captured.out
     assert captured.err == ""
+
+
+def test_resource_usage_command_uses_custom_threshold(
+    monkeypatch,
+    capsys,
+) -> None:
+    monkeypatch.setattr(
+        "sys.argv",
+        ["infra-toolkit", "resource-usage", "--threshold", "90"],
+    )
+    monkeypatch.setattr(
+        "infra_toolkit.cli.get_resource_usage",
+        lambda: {
+            "cpu_percent": 92.0,
+            "memory_percent": 85.0,
+            "disk_percent": 88.0,
+        },
+    )
+
+    exit_code = main()
+    captured = capsys.readouterr()
+
+    assert exit_code == 0
+    assert "WARNING: Resource usage threshold exceeded (90%)." in captured.out
+    assert "- CPU" in captured.out
+    assert "- Memory" not in captured.out
+    assert "- Disk" not in captured.out
+    assert captured.err == ""
+
+
+@pytest.mark.parametrize(
+    ("threshold", "error_message"),
+    [
+        ("-1", "Threshold must be between 0 and 100."),
+        ("101", "Threshold must be between 0 and 100."),
+        ("abc", "Threshold must be a number between 0 and 100."),
+    ],
+)
+def test_resource_usage_command_rejects_invalid_threshold(
+    monkeypatch,
+    capsys,
+    threshold,
+    error_message,
+) -> None:
+    monkeypatch.setattr(
+        "sys.argv",
+        ["infra-toolkit", "resource-usage", "--threshold", threshold],
+    )
+
+    with pytest.raises(SystemExit) as exc_info:
+        main()
+
+    captured = capsys.readouterr()
+
+    assert exc_info.value.code == 2
+    assert error_message in captured.err
+    assert "Traceback" not in captured.err

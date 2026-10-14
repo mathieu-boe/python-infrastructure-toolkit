@@ -6,6 +6,19 @@ from infra_toolkit.system_info import get_system_info
 from infra_toolkit.thresholds import find_threshold_violations
 
 
+def parse_threshold(value: str) -> float:
+    """Parse and validate a resource usage threshold."""
+    try:
+        threshold = float(value)
+    except ValueError as exc:
+        raise argparse.ArgumentTypeError("Threshold must be a number between 0 and 100.") from exc
+
+    if not 0.0 <= threshold <= 100.0:
+        raise argparse.ArgumentTypeError("Threshold must be between 0 and 100.")
+
+    return threshold
+
+
 def main() -> int:
     parser = argparse.ArgumentParser(
         prog="infra-toolkit",
@@ -14,7 +27,17 @@ def main() -> int:
     subparsers = parser.add_subparsers(dest="command", required=True)
     subparsers.add_parser("health", help="Check toolkit health")
     subparsers.add_parser("system-info", help="Display system information")
-    subparsers.add_parser("resource-usage", help="Display resource usage")
+    resource_parser = subparsers.add_parser(
+        "resource-usage",
+        help="Display resource usage",
+    )
+
+    resource_parser.add_argument(
+        "--threshold",
+        type=parse_threshold,
+        default=85.0,
+        help="Resource usage warning threshold (default: 85%%).",
+    )
 
     args = parser.parse_args()
 
@@ -31,7 +54,10 @@ def main() -> int:
 
     elif args.command == "resource-usage":
         usage = get_resource_usage()
-        violations = find_threshold_violations(usage)
+        violations = find_threshold_violations(
+            usage,
+            threshold=args.threshold,
+        )
 
         print("Resource Usage")
         print("--------------")
@@ -42,7 +68,7 @@ def main() -> int:
 
         if violations:
             print()
-            print("WARNING: Resource usage threshold exceeded (85%).")
+            print(f"WARNING: Resource usage threshold exceeded ({args.threshold:g}%).")
 
             resource_labels = {
                 "cpu_percent": "CPU",

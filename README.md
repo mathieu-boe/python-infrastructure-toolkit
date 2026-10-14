@@ -39,7 +39,7 @@ A Python-based toolkit for infrastructure operations, built as part of my hands-
 - [x] All 6 automated tests passing.
 - [x] GitHub Actions pipeline passing.
 
-**Milestone 4 — Resource usage monitoring** (implemented; local checks passing)
+**Milestone 4 — Resource usage monitoring** (completed)
 
 - [x] Resource usage module implemented using `psutil`.
 - [x] CPU, memory, and disk usage percentages reported.
@@ -49,7 +49,7 @@ A Python-based toolkit for infrastructure operations, built as part of my hands-
 - [x] Ruff linting and formatting checks passing.
 - [x] All 9 automated tests passing locally.
 
-**Milestone 5 — Threshold-based resource monitoring** (implemented; local checks passing)
+**Milestone 5 — Threshold-based resource monitoring** (completed)
 
 - [x] Reusable threshold evaluation function implemented in `thresholds.py`.
 - [x] Default resource usage threshold set to 85%.
@@ -62,17 +62,30 @@ A Python-based toolkit for infrastructure operations, built as part of my hands-
 - [x] All 15 automated tests passing locally.
 - [x] GitHub Actions pipeline passing.
 
+**Milestone 6 — Configurable resource thresholds** (implemented; local checks passing)
+
+- [x] `--threshold` CLI argument added to the `resource-usage` command.
+- [x] Default threshold remains 85%.
+- [x] Custom integer and decimal thresholds supported.
+- [x] Threshold values validated within the inclusive range of 0–100.
+- [x] Non-numeric and out-of-range values rejected with clear CLI errors.
+- [x] Warning output displays the configured threshold.
+- [x] Automated tests added for custom thresholds and invalid input.
+- [x] Ruff linting, formatting, and automated tests passing locally.
+
 ## Development
 
 The project uses Python 3.14+, `psutil` for resource monitoring, pytest for automated testing, and Ruff for linting and formatting. A local virtual environment is stored in `.venv/` and excluded from version control through `.gitignore`.
 
-Clone the repository using SSH or HTTPS:
+### Clone the repository
+
+Clone using SSH or HTTPS:
 
 ```bash
 # SSH (requires an SSH key configured with GitHub)
 git clone git@github.com:mathieu-boe/python-infrastructure-toolkit.git
 
-# Alternatively, you can use HTTPS
+# Alternatively, use HTTPS
 git clone https://github.com/mathieu-boe/python-infrastructure-toolkit.git
 ```
 
@@ -90,7 +103,7 @@ Install the project in editable mode with its development dependencies:
 python -m pip install -e ".[dev]"
 ```
 
-Run the health check:
+### Health check
 
 ```bash
 infra-toolkit health
@@ -102,7 +115,7 @@ Expected output:
 Status: operational
 ```
 
-Display basic system information:
+### System information
 
 ```bash
 infra-toolkit system-info
@@ -120,11 +133,15 @@ Architecture: x86_64
 
 *Note: The output reflects the environment where the command is executed, so values may differ across operating systems and machines.*
 
+### Resource usage monitoring
+
 Display current CPU, memory, and disk usage:
 
 ```bash
 infra-toolkit resource-usage
 ```
+
+The default warning threshold is 85%.
 
 Example output:
 
@@ -134,11 +151,13 @@ Resource Usage
 CPU usage: 0.7%
 Memory usage: 7.0%
 Disk usage: 0.4%
+
+Status: All resource usage is within thresholds.
 ```
 
 *Note: These percentages are illustrative. Actual values depend on current system activity and the filesystem containing the current working directory.*
 
-When CPU, memory, or disk usage exceeds the default threshold of 85%, the CLI displays a warning identifying the affected resources.
+When any resource exceeds the threshold, the CLI displays a warning identifying the affected resources.
 
 Example warning output:
 
@@ -154,15 +173,46 @@ WARNING: Resource usage threshold exceeded (85%).
 - Disk
 ```
 
-If no resource exceeds the threshold, the CLI reports that all resource usage is within thresholds. The threshold is currently fixed at 85% in the CLI; configurable command-line thresholds are not implemented yet.
+### Configurable thresholds
 
-Display available commands:
+Override the default threshold using the `--threshold` argument:
+
+```bash
+infra-toolkit resource-usage --threshold 90
+```
+
+Decimal thresholds are also supported:
+
+```bash
+infra-toolkit resource-usage --threshold 87.5
+```
+
+The threshold must be between 0 and 100, inclusive. A warning is triggered only when resource usage **exceeds** the configured threshold; usage equal to the threshold does not trigger a warning.
+
+Invalid values are rejected with a command-line error rather than a Python traceback. For example:
+
+```bash
+infra-toolkit resource-usage --threshold 101
+infra-toolkit resource-usage --threshold abc
+```
+
+Display the available resource monitoring options:
+
+```bash
+infra-toolkit resource-usage --help
+```
+
+### Command help
+
+Display all available commands:
 
 ```bash
 infra-toolkit --help
 ```
 
-Run the quality checks and automated tests from the repository root:
+### Run quality checks and automated tests
+
+Run these commands from the repository root with the virtual environment activated:
 
 ```bash
 python -m ruff check .
@@ -170,8 +220,14 @@ python -m ruff format --check .
 python -m pytest -v
 ```
 
+To apply automatic formatting:
+
+```bash
+python -m ruff format .
+```
+
 ## Security and cost
 
-The current development environment runs locally and does not require AWS resources/cloud expenditure.
+The current development environment runs locally and does not require AWS resources or incur AWS infrastructure costs.
 
-No credentials, secrets, or generated virtual-environment files are to be committed.
+The toolkit reads local system resource metrics. No AWS credentials are required, and secrets or generated virtual-environment files must not be committed.
