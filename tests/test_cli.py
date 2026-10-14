@@ -1,3 +1,5 @@
+import json
+
 import pytest
 
 from infra_toolkit.cli import main
@@ -94,7 +96,7 @@ def test_resource_usage_command_warns_when_threshold_exceeded(
     exit_code = main()
     captured = capsys.readouterr()
 
-    assert exit_code == 0
+    assert exit_code == 1
     assert "CPU usage: 92.0%" in captured.out
     assert "Disk usage: 88.0%" in captured.out
     assert "WARNING: Resource usage threshold exceeded (85%)." in captured.out
@@ -124,7 +126,7 @@ def test_resource_usage_command_uses_custom_threshold(
     exit_code = main()
     captured = capsys.readouterr()
 
-    assert exit_code == 0
+    assert exit_code == 1
     assert "WARNING: Resource usage threshold exceeded (90%)." in captured.out
     assert "- CPU" in captured.out
     assert "- Memory" not in captured.out
@@ -159,3 +161,70 @@ def test_resource_usage_command_rejects_invalid_threshold(
     assert exc_info.value.code == 2
     assert error_message in captured.err
     assert "Traceback" not in captured.err
+
+
+def test_resource_usage_command_outputs_valid_json(
+    monkeypatch,
+    capsys,
+) -> None:
+    monkeypatch.setattr(
+        "sys.argv",
+        ["infra-toolkit", "resource-usage", "--json"],
+    )
+    monkeypatch.setattr(
+        "infra_toolkit.cli.get_resource_usage",
+        lambda: {
+            "cpu_percent": 25.0,
+            "memory_percent": 60.0,
+            "disk_percent": 75.0,
+        },
+    )
+
+    exit_code = main()
+    captured = capsys.readouterr()
+    result = json.loads(captured.out)
+
+    assert exit_code == 0
+    assert result == {
+        "cpu_percent": 25.0,
+        "memory_percent": 60.0,
+        "disk_percent": 75.0,
+        "threshold": 85.0,
+        "status": "ok",
+        "violations": [],
+    }
+    assert captured.err == ""
+
+
+def test_resource_usage_json_returns_one_when_threshold_exceeded(
+    monkeypatch,
+    capsys,
+) -> None:
+    monkeypatch.setattr(
+        "sys.argv",
+        [
+            "infra-toolkit",
+            "resource-usage",
+            "--threshold",
+            "90",
+            "--json",
+        ],
+    )
+    monkeypatch.setattr(
+        "infra_toolkit.cli.get_resource_usage",
+        lambda: {
+            "cpu_percent": 92.0,
+            "memory_percent": 60.0,
+            "disk_percent": 88.0,
+        },
+    )
+
+    exit_code = main()
+    captured = capsys.readouterr()
+    result = json.loads(captured.out)
+
+    assert exit_code == 1
+    assert result["threshold"] == 90.0
+    assert result["status"] == "threshold_exceeded"
+    assert result["violations"] == ["cpu_percent"]
+    assert captured.err == ""

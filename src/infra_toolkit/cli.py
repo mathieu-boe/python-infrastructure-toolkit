@@ -1,4 +1,5 @@
 import argparse
+import json
 
 from infra_toolkit.health import check_status
 from infra_toolkit.resource_usage import get_resource_usage
@@ -39,6 +40,12 @@ def main() -> int:
         help="Resource usage warning threshold (default: 85%%).",
     )
 
+    resource_parser.add_argument(
+        "--json",
+        action="store_true",
+        help="Output resource usage as JSON.",
+    )
+
     args = parser.parse_args()
 
     if args.command == "health":
@@ -59,9 +66,19 @@ def main() -> int:
             threshold=args.threshold,
         )
 
+        if args.json:
+            result = {
+                **usage,
+                "threshold": args.threshold,
+                "status": "threshold_exceeded" if violations else "ok",
+                "violations": violations,
+            }
+            print(json.dumps(result, indent=2))
+            return 1 if violations else 0
+
         print("Resource Usage")
         print("--------------")
-        #:.1f formatting displays each percentage to one decimal place
+        # Display each percentage to one decimal place.
         print(f"CPU usage: {usage['cpu_percent']:.1f}%")
         print(f"Memory usage: {usage['memory_percent']:.1f}%")
         print(f"Disk usage: {usage['disk_percent']:.1f}%")
@@ -81,6 +98,8 @@ def main() -> int:
         else:
             print()
             print("Status: All resource usage is within thresholds.")
+
+        return 1 if violations else 0
 
     return 0
 

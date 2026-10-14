@@ -62,7 +62,7 @@ A Python-based toolkit for infrastructure operations, built as part of my hands-
 - [x] All 15 automated tests passing locally.
 - [x] GitHub Actions pipeline passing.
 
-**Milestone 6 — Configurable resource thresholds** (implemented; local checks passing)
+**Milestone 6 — Configurable resource thresholds** (completed locally)
 
 - [x] `--threshold` CLI argument added to the `resource-usage` command.
 - [x] Default threshold remains 85%.
@@ -72,6 +72,19 @@ A Python-based toolkit for infrastructure operations, built as part of my hands-
 - [x] Warning output displays the configured threshold.
 - [x] Automated tests added for custom thresholds and invalid input.
 - [x] Ruff linting, formatting, and automated tests passing locally.
+
+**Milestone 7 — JSON output and automation-ready exit codes** (implemented; local tests passing)
+
+- [x] Optional `--json` argument added to the `resource-usage` command.
+- [x] Structured JSON output includes resource measurements, threshold, status, and violations.
+- [x] Human-readable output remains the default.
+- [x] Exit code `0` returned when resource usage is within the configured threshold.
+- [x] Exit code `1` returned when one or more resources exceed the threshold.
+- [x] Invalid command-line arguments continue to use exit code `2`.
+- [x] Automated tests added for healthy and threshold-exceeded JSON results.
+- [x] Human-readable warning tests updated to verify exit code `1`.
+- [x] All 21 automated tests passing locally.
+- [ ] GitHub Actions pipeline verified for Milestone 7.
 
 ## Development
 
@@ -193,22 +206,87 @@ Invalid values are rejected with a command-line error rather than a Python trace
 
 ```bash
 infra-toolkit resource-usage --threshold 101
-usage: infra-toolkit resource-usage [-h] [--threshold THRESHOLD]
+```
+
+```text
+usage: infra-toolkit resource-usage [-h] [--threshold THRESHOLD] [--json]
 infra-toolkit resource-usage: error: argument --threshold: Threshold must be between 0 and 100.
 ```
+
+Another invalid input:
+
 ```bash
 infra-toolkit resource-usage --threshold abc
-usage: infra-toolkit resource-usage [-h] [--threshold THRESHOLD]
+```
+
+```text
+usage: infra-toolkit resource-usage [-h] [--threshold THRESHOLD] [--json]
 infra-toolkit resource-usage: error: argument --threshold: Threshold must be a number between 0 and 100.
 ```
 
-Display the available resource monitoring options:
+### JSON output
+
+Use `--json` to produce structured output suitable for scripts and automation:
+
+```bash
+infra-toolkit resource-usage --json
+```
+
+Example output when all resources are within the threshold:
+
+```json
+{
+  "cpu_percent": 25.0,
+  "memory_percent": 60.0,
+  "disk_percent": 75.0,
+  "threshold": 85.0,
+  "status": "ok",
+  "violations": []
+}
+```
+
+Use JSON with a custom threshold when needed:
+
+```bash
+infra-toolkit resource-usage --threshold 90 --json
+```
+
+Example output when CPU usage exceeds the threshold:
+
+```json
+{
+  "cpu_percent": 92.0,
+  "memory_percent": 60.0,
+  "disk_percent": 88.0,
+  "threshold": 90.0,
+  "status": "threshold_exceeded",
+  "violations": [
+    "cpu_percent"
+  ]
+}
+```
+
+The `status` field is `ok` when no resource exceeds the threshold and `threshold_exceeded` otherwise. The `violations` list contains the keys of the resources that exceed the configured threshold.
+
+### Exit codes
+
+The `resource-usage` command uses exit codes so that scripts and CI pipelines can react to monitoring results.
+
+| Exit code | Meaning |
+|---|---|
+| `0` | Monitoring completed; no threshold exceeded. |
+| `1` | Monitoring completed; at least one threshold exceeded. |
+| `2` | Invalid command-line arguments. |
+
+The same monitoring exit codes apply to human-readable and JSON output. The `health` and `system-info` commands return `0` when successful.
+
+### Command help
+
+Display available resource monitoring options:
 
 ```bash
 infra-toolkit resource-usage --help
 ```
-
-### Command help
 
 Display all available commands:
 
